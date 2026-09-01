@@ -1,0 +1,20 @@
+packages:
+  - "."
+
+# Delay newly published dependencies by 48 hours unless explicitly reviewed
+# and listed below.
+minimumReleaseAge: 2880
+minimumReleaseAgeStrict: true
+
+allowBuilds:
+  esbuild: true
+minimumReleaseAgeExclude:
+  - "@typescript-eslint/parser@8.69.0"
+  - "@typescript-eslint/project-service@8.69.0"
+  - "@typescript-eslint/rule-tester@8.69.0"
+  - "@typescript-eslint/scope-manager@8.69.0"
+  - "@typescript-eslint/tsconfig-utils@8.69.0"
+  - "@typescript-eslint/types@8.69.0"
+  - "@typescript-eslint/typescript-estree@8.69.0"
+  - "@typescript-eslint/utils@8.69.0"
+  - "@typescript-eslint/visitor-keys@8.69.0"
