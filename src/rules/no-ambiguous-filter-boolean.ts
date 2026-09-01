@@ -1,13 +1,9 @@
-import {
-  AST_NODE_TYPES,
-  ESLintUtils,
-  type TSESLint,
-  type TSESTree,
-} from "@typescript-eslint/utils";
+import { AST_NODE_TYPES, ESLintUtils } from "@typescript-eslint/utils";
 
 import { createRule } from "../utils/create-rule.js";
-import { getArrayElementType } from "../utils/get-array-element-type.js";
+import { getArrayFilterCall, isGlobalIdentifier } from "../utils/array-filter.js";
 import { type FalsyKind, getPossibleFalsyValues } from "../utils/get-possible-falsy-values.js";
+import { containsNullishType } from "../utils/type-properties.js";
 
 type MessageIds = "ambiguousFilterBoolean";
 
@@ -25,14 +21,14 @@ export const noAmbiguousFilterBoolean = createRule<[], MessageIds>({
     type: "suggestion",
     docs: {
       description: "Flag filter(Boolean) when the element type includes non-nullish falsy values.",
-      recommended: false,
+      recommended: true,
       requiresTypeChecking: true,
     },
     hasSuggestions: false,
     schema: [],
     messages: {
       ambiguousFilterBoolean:
-        "filter(Boolean) may remove non-nullish values from this array: {{values}}. If you only intend to remove null or undefined, use an explicit nullish predicate.",
+        "filter(Boolean) may remove non-nullish values from this array: {{values}}. If you only intend to remove null or undefined, use isNotNil.",
     },
   },
   defaultOptions: [],
@@ -42,33 +38,22 @@ export const noAmbiguousFilterBoolean = createRule<[], MessageIds>({
 
     return {
       CallExpression(node): void {
-        const booleanArgument = getBooleanArgument(node);
+        const filterCall = getArrayFilterCall(node, services, checker);
+        const booleanArgument = filterCall?.predicate;
         if (
-          booleanArgument == null ||
-          isShadowedBoolean(booleanArgument) ||
-          !isDefaultLibrarySymbol(booleanArgument)
+          filterCall == null ||
+          node.arguments.length !== 1 ||
+          booleanArgument?.type !== AST_NODE_TYPES.Identifier ||
+          !isGlobalIdentifier(context.sourceCode, services, booleanArgument, "Boolean")
         ) {
           return;
         }
 
-        const callee = node.callee;
-        if (
-          callee.type !== AST_NODE_TYPES.MemberExpression ||
-          callee.computed ||
-          callee.property.type !== AST_NODE_TYPES.Identifier ||
-          callee.property.name !== "filter" ||
-          !isDefaultLibrarySymbol(callee.property)
-        ) {
+        if (!containsNullishType(filterCall.elementType)) {
           return;
         }
 
-        const receiverType = checker.getNonNullableType(services.getTypeAtLocation(callee.object));
-        const elementType = getArrayElementType(checker, receiverType);
-        if (elementType == null) {
-          return;
-        }
-
-        const falsyValues = getPossibleFalsyValues(elementType);
+        const falsyValues = getPossibleFalsyValues(filterCall.elementType);
         if (falsyValues.length === 0) {
           return;
         }
@@ -82,45 +67,5 @@ export const noAmbiguousFilterBoolean = createRule<[], MessageIds>({
         });
       },
     };
-
-    function isDefaultLibrarySymbol(node: TSESTree.Identifier): boolean {
-      const symbol = services.getSymbolAtLocation(node);
-      const declarations = symbol?.getDeclarations();
-
-      return (
-        declarations != null &&
-        declarations.length > 0 &&
-        declarations.every((declaration) =>
-          services.program.isSourceFileDefaultLibrary(declaration.getSourceFile()),
-        )
-      );
-    }
-
-    function isShadowedBoolean(node: TSESTree.Identifier): boolean {
-      // TypeScript may resolve a top-level script redeclaration to the global
-      // lib symbol even though ESLint's scope manager can see the local binding.
-      let scope: TSESLint.Scope.Scope | null = context.sourceCode.getScope(node);
-
-      while (scope != null) {
-        const variable = scope.variables.find((candidate) => candidate.name === "Boolean");
-        if (variable != null && variable.defs.length > 0) {
-          return true;
-        }
-        scope = scope.upper;
-      }
-
-      return false;
-    }
   },
 });
-
-function getBooleanArgument(node: TSESTree.CallExpression): TSESTree.Identifier | undefined {
-  if (node.optional || node.arguments.length !== 1) {
-    return undefined;
-  }
-
-  const argument = node.arguments[0];
-  return argument?.type === AST_NODE_TYPES.Identifier && argument.name === "Boolean"
-    ? argument
-    : undefined;
-}

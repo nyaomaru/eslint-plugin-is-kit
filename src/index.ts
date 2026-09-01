@@ -1,4 +1,18 @@
+import type { TSESLint } from "@typescript-eslint/utils";
+
 import { noAmbiguousFilterBoolean } from "./rules/no-ambiguous-filter-boolean.js";
+import { noRedundantPredicate } from "./rules/no-redundant-predicate.js";
+import { preferIsNonNullish } from "./rules/prefer-is-non-nullish.js";
+import { preferTypeGuardFilter } from "./rules/prefer-type-guard-filter.js";
+
+export interface IsKitPlugin extends TSESLint.FlatConfig.Plugin {
+  configs: {
+    recommended: TSESLint.FlatConfig.Config;
+    stylistic: TSESLint.FlatConfig.Config;
+    strict: TSESLint.FlatConfig.Config;
+  };
+  rules: NonNullable<TSESLint.FlatConfig.Plugin["rules"]>;
+}
 
 const plugin = {
   meta: {
@@ -7,8 +21,46 @@ const plugin = {
   },
   rules: {
     "no-ambiguous-filter-boolean": noAmbiguousFilterBoolean,
+    "no-redundant-predicate": noRedundantPredicate,
+    "prefer-is-non-nullish": preferIsNonNullish,
+    "prefer-type-guard-filter": preferTypeGuardFilter,
   },
-};
+  configs: {},
+} as unknown as IsKitPlugin;
+
+Object.assign(plugin.configs, {
+  recommended: {
+    name: "is-kit/recommended",
+    plugins: { "is-kit": plugin },
+    rules: {
+      "is-kit/no-ambiguous-filter-boolean": "error",
+      "is-kit/no-redundant-predicate": "error",
+    },
+  },
+  stylistic: {
+    name: "is-kit/stylistic",
+    plugins: { "is-kit": plugin },
+    rules: {
+      "is-kit/prefer-is-non-nullish": "error",
+      "is-kit/prefer-type-guard-filter": "error",
+    },
+  },
+  strict: {
+    name: "is-kit/strict",
+    plugins: { "is-kit": plugin },
+    rules: {
+      "is-kit/no-ambiguous-filter-boolean": "error",
+      "is-kit/no-redundant-predicate": "error",
+      "is-kit/prefer-is-non-nullish": "error",
+      "is-kit/prefer-type-guard-filter": "error",
+    },
+  },
+} satisfies TSESLint.FlatConfig.SharedConfigs);
 
 export default plugin;
-export { noAmbiguousFilterBoolean };
+export {
+  noAmbiguousFilterBoolean,
+  noRedundantPredicate,
+  preferIsNonNullish,
+  preferTypeGuardFilter,
+};

@@ -1,23 +1,5 @@
-import { RuleTester } from "@typescript-eslint/rule-tester";
-import { afterAll, describe, it } from "vitest";
-
 import { noAmbiguousFilterBoolean } from "../../src/rules/no-ambiguous-filter-boolean.js";
-
-RuleTester.afterAll = afterAll;
-RuleTester.describe = describe;
-RuleTester.it = it;
-RuleTester.itOnly = it.only;
-
-const ruleTester = new RuleTester({
-  languageOptions: {
-    parserOptions: {
-      projectService: {
-        allowDefaultProject: ["*.ts"],
-      },
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-});
+import { ruleTester } from "../rule-tester.js";
 
 ruleTester.run("no-ambiguous-filter-boolean", noAmbiguousFilterBoolean, {
   valid: [
@@ -123,6 +105,18 @@ ruleTester.run("no-ambiguous-filter-boolean", noAmbiguousFilterBoolean, {
       const x: Array<1 | 2 | null> = [];
       x.filter(Boolean);
     `,
+    `[1, 2, 3].filter(Boolean);`,
+    `["a", "b"].filter(Boolean);`,
+    `
+      declare const numbers: number[];
+      declare const strings: string[];
+      declare const booleans: boolean[];
+      declare const bigints: bigint[];
+      numbers.filter(Boolean);
+      strings.filter(Boolean);
+      booleans.filter(Boolean);
+      bigints.filter(Boolean);
+    `,
   ],
   invalid: [
     {
@@ -141,6 +135,18 @@ ruleTester.run("no-ambiguous-filter-boolean", noAmbiguousFilterBoolean, {
     {
       code: `
         const values: Array<number | undefined> = [];
+        values.filter(Boolean);
+      `,
+      errors: [
+        {
+          messageId: "ambiguousFilterBoolean",
+          data: { values: "0, NaN" },
+        },
+      ],
+    },
+    {
+      code: `
+        const values: Array<number | void> = [];
         values.filter(Boolean);
       `,
       errors: [
@@ -226,76 +232,6 @@ ruleTester.run("no-ambiguous-filter-boolean", noAmbiguousFilterBoolean, {
       code: `
         const values: Array<bigint | null> = [];
         values.filter(Boolean);
-      `,
-      errors: [
-        {
-          messageId: "ambiguousFilterBoolean",
-          data: { values: "0n" },
-        },
-      ],
-    },
-    {
-      code: `
-        [1, 2, 3].filter(Boolean);
-      `,
-      errors: [
-        {
-          messageId: "ambiguousFilterBoolean",
-          data: { values: "0, NaN" },
-        },
-      ],
-    },
-    {
-      code: `
-        ["a", "b"].filter(Boolean);
-      `,
-      errors: [
-        {
-          messageId: "ambiguousFilterBoolean",
-          data: { values: 'empty string ("")' },
-        },
-      ],
-    },
-    {
-      code: `
-        declare const numbers: number[];
-        numbers.filter(Boolean);
-      `,
-      errors: [
-        {
-          messageId: "ambiguousFilterBoolean",
-          data: { values: "0, NaN" },
-        },
-      ],
-    },
-    {
-      code: `
-        declare const strings: string[];
-        strings.filter(Boolean);
-      `,
-      errors: [
-        {
-          messageId: "ambiguousFilterBoolean",
-          data: { values: 'empty string ("")' },
-        },
-      ],
-    },
-    {
-      code: `
-        declare const booleans: boolean[];
-        booleans.filter(Boolean);
-      `,
-      errors: [
-        {
-          messageId: "ambiguousFilterBoolean",
-          data: { values: "false" },
-        },
-      ],
-    },
-    {
-      code: `
-        declare const bigints: bigint[];
-        bigints.filter(Boolean);
       `,
       errors: [
         {
