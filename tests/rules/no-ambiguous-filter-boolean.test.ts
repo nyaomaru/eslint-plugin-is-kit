@@ -22,6 +22,26 @@ const ruleTester = new RuleTester({
 ruleTester.run("no-ambiguous-filter-boolean", noAmbiguousFilterBoolean, {
   valid: [
     `
+      interface User {
+        id: string;
+      }
+      declare const users: Array<User | null | undefined>;
+      users.filter(Boolean);
+    `,
+    `
+      interface User {
+        id: string;
+      }
+      declare const users: Array<User | null | undefined> | undefined;
+      users?.filter(Boolean);
+    `,
+    `
+      ([1, 2, 3] as const).filter(Boolean);
+    `,
+    `
+      (["a", "b"] as const).filter(Boolean);
+    `,
+    `
       const values: Array<object | null | undefined> = [];
       values.filter(Boolean);
     `,
@@ -46,6 +66,19 @@ ruleTester.run("no-ambiguous-filter-boolean", noAmbiguousFilterBoolean, {
       const values: Array<string | null> = [];
       const Boolean = (_value: unknown) => true;
       values.filter(Boolean);
+    `,
+    `
+      export {};
+      const values: Array<string | null> = [];
+      const Boolean = (_value: unknown) => true;
+      values.filter(Boolean);
+    `,
+    `
+      const values: Array<string | null> = [];
+      function filterValues() {
+        const Boolean = (_value: unknown) => true;
+        return values.filter(Boolean);
+      }
     `,
     `
       const values: Array<string | null> = [];
@@ -85,6 +118,10 @@ ruleTester.run("no-ambiguous-filter-boolean", noAmbiguousFilterBoolean, {
       function filterValues<T extends string>(values: T[]) {
         return values.filter(Boolean);
       }
+    `,
+    `
+      const x: Array<1 | 2 | null> = [];
+      x.filter(Boolean);
     `,
   ],
   invalid: [
@@ -194,6 +231,124 @@ ruleTester.run("no-ambiguous-filter-boolean", noAmbiguousFilterBoolean, {
         {
           messageId: "ambiguousFilterBoolean",
           data: { values: "0n" },
+        },
+      ],
+    },
+    {
+      code: `
+        [1, 2, 3].filter(Boolean);
+      `,
+      errors: [
+        {
+          messageId: "ambiguousFilterBoolean",
+          data: { values: "0, NaN" },
+        },
+      ],
+    },
+    {
+      code: `
+        ["a", "b"].filter(Boolean);
+      `,
+      errors: [
+        {
+          messageId: "ambiguousFilterBoolean",
+          data: { values: 'empty string ("")' },
+        },
+      ],
+    },
+    {
+      code: `
+        declare const numbers: number[];
+        numbers.filter(Boolean);
+      `,
+      errors: [
+        {
+          messageId: "ambiguousFilterBoolean",
+          data: { values: "0, NaN" },
+        },
+      ],
+    },
+    {
+      code: `
+        declare const strings: string[];
+        strings.filter(Boolean);
+      `,
+      errors: [
+        {
+          messageId: "ambiguousFilterBoolean",
+          data: { values: 'empty string ("")' },
+        },
+      ],
+    },
+    {
+      code: `
+        declare const booleans: boolean[];
+        booleans.filter(Boolean);
+      `,
+      errors: [
+        {
+          messageId: "ambiguousFilterBoolean",
+          data: { values: "false" },
+        },
+      ],
+    },
+    {
+      code: `
+        declare const bigints: bigint[];
+        bigints.filter(Boolean);
+      `,
+      errors: [
+        {
+          messageId: "ambiguousFilterBoolean",
+          data: { values: "0n" },
+        },
+      ],
+    },
+    {
+      code: `
+        declare const mixed: Array<string | number | boolean | bigint | null>;
+        mixed.filter(Boolean);
+      `,
+      errors: [
+        {
+          messageId: "ambiguousFilterBoolean",
+          data: { values: 'empty string (""), 0, NaN, false, 0n' },
+        },
+      ],
+    },
+    {
+      code: `
+        declare const values: Array<string | null> | undefined;
+        values?.filter(Boolean);
+      `,
+      errors: [
+        {
+          messageId: "ambiguousFilterBoolean",
+          data: { values: 'empty string ("")' },
+        },
+      ],
+    },
+    {
+      code: `
+        const y: Array<0 | 1 | null> = [];
+        y.filter(Boolean);
+      `,
+      errors: [
+        {
+          messageId: "ambiguousFilterBoolean",
+          data: { values: "0" },
+        },
+      ],
+    },
+    {
+      code: `
+        const z: Array<"" | "foo" | undefined> = [];
+        z.filter(Boolean);
+      `,
+      errors: [
+        {
+          messageId: "ambiguousFilterBoolean",
+          data: { values: 'empty string ("")' },
         },
       ],
     },

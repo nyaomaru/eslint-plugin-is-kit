@@ -19,9 +19,10 @@ The rule reports the specific values that `Boolean` may remove:
 `any`, `unknown`, and type parameters are not reported because their possible
 contents are not concrete enough for this rule.
 
-The syntax match is intentionally narrow. It only checks a direct,
-non-optional `array.filter(Boolean)` call with the built-in global `Boolean` as
-its sole argument. Aliases, arrow functions, computed access, custom `filter`
+The syntax match is intentionally narrow. It only checks a direct
+`array.filter(Boolean)` or `array?.filter(Boolean)` call with the built-in
+global `Boolean` as its sole argument. Aliases, arrow functions, computed
+access, optional calls such as `array.filter?.(Boolean)`, custom `filter`
 methods, and a locally shadowed `Boolean` are ignored.
 
 Examples of **incorrect** code:
@@ -32,6 +33,8 @@ names.filter(Boolean); // May also remove "".
 
 const values: Array<number | undefined> = [];
 values.filter(Boolean); // May also remove 0 and NaN.
+
+[1, 2, 3].filter(Boolean); // Inferred as number[], so 0 and NaN are possible.
 ```
 
 Examples of **correct** code:
@@ -42,6 +45,8 @@ records.filter(Boolean);
 
 const states: Array<"ready" | "done" | null> = [];
 states.filter(Boolean);
+
+([1, 2, 3] as const).filter(Boolean); // Element type is 1 | 2 | 3.
 ```
 
 If only nullish values should be removed, use an explicit predicate. `isNotNil`

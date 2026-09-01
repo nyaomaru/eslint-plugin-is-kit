@@ -55,7 +55,6 @@ export const noAmbiguousFilterBoolean = createRule<[], MessageIds>({
         if (
           callee.type !== AST_NODE_TYPES.MemberExpression ||
           callee.computed ||
-          callee.optional ||
           callee.property.type !== AST_NODE_TYPES.Identifier ||
           callee.property.name !== "filter" ||
           !isDefaultLibrarySymbol(callee.property)
@@ -63,7 +62,7 @@ export const noAmbiguousFilterBoolean = createRule<[], MessageIds>({
           return;
         }
 
-        const receiverType = services.getTypeAtLocation(callee.object);
+        const receiverType = checker.getNonNullableType(services.getTypeAtLocation(callee.object));
         const elementType = getArrayElementType(checker, receiverType);
         if (elementType == null) {
           return;
@@ -98,6 +97,8 @@ export const noAmbiguousFilterBoolean = createRule<[], MessageIds>({
     }
 
     function isShadowedBoolean(node: TSESTree.Identifier): boolean {
+      // TypeScript may resolve a top-level script redeclaration to the global
+      // lib symbol even though ESLint's scope manager can see the local binding.
       let scope: TSESLint.Scope.Scope | null = context.sourceCode.getScope(node);
 
       while (scope != null) {
