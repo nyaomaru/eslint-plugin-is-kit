@@ -8,16 +8,30 @@ import type ts from "typescript";
 
 import { getArrayElementType } from "./get-array-element-type.js";
 
-export interface ArrayFilterCall {
+export interface ArrayPredicateCall {
   elementType: ts.Type;
+  method: ArrayPredicateMethod;
   predicate: TSESTree.CallExpression["arguments"][number];
 }
+
+export type ArrayPredicateMethod = "filter" | "find" | "some" | "every";
+
+const arrayPredicateMethods = new Set<ArrayPredicateMethod>(["filter", "find", "some", "every"]);
 
 export function getArrayFilterCall(
   node: TSESTree.CallExpression,
   services: ParserServicesWithTypeInformation,
   checker: ts.TypeChecker,
-): ArrayFilterCall | undefined {
+): ArrayPredicateCall | undefined {
+  const call = getArrayPredicateCall(node, services, checker);
+  return call?.method === "filter" ? call : undefined;
+}
+
+export function getArrayPredicateCall(
+  node: TSESTree.CallExpression,
+  services: ParserServicesWithTypeInformation,
+  checker: ts.TypeChecker,
+): ArrayPredicateCall | undefined {
   if (node.optional || node.arguments.length === 0) {
     return undefined;
   }
@@ -27,7 +41,7 @@ export function getArrayFilterCall(
     callee.type !== AST_NODE_TYPES.MemberExpression ||
     callee.computed ||
     callee.property.type !== AST_NODE_TYPES.Identifier ||
-    callee.property.name !== "filter" ||
+    !isArrayPredicateMethod(callee.property.name) ||
     !isDefaultLibrarySymbol(services, callee.property)
   ) {
     return undefined;
@@ -37,7 +51,13 @@ export function getArrayFilterCall(
   const elementType = getArrayElementType(checker, receiverType);
   const predicate = node.arguments[0];
 
-  return elementType == null || predicate == null ? undefined : { elementType, predicate };
+  return elementType == null || predicate == null
+    ? undefined
+    : { elementType, method: callee.property.name, predicate };
+}
+
+function isArrayPredicateMethod(value: string): value is ArrayPredicateMethod {
+  return arrayPredicateMethods.has(value as ArrayPredicateMethod);
 }
 
 export function isDefaultLibrarySymbol(
