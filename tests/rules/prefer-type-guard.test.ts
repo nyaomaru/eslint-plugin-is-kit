@@ -48,15 +48,13 @@ ruleTester.run("prefer-type-guard", preferTypeGuard, {
     `
       declare const values: Array<"a" | "b" | number>;
       values.find(value => typeof value === "string");
+      values.findLast(value => typeof value === "string");
       values.every(value => typeof value === "string");
     `,
     `
-      declare const values: string[];
+      declare const values: unknown[];
       values.some(value => typeof value === "string");
-    `,
-    `
-      declare const values: number[];
-      values.some(value => typeof value === "string");
+      values.some(value => Array.isArray(value));
     `,
     `
       declare const value: unknown;
@@ -102,6 +100,13 @@ ruleTester.run("prefer-type-guard", preferTypeGuard, {
         [index: number]: unknown;
       } = {} as never;
       custom.find(value => typeof value === "string");
+    `,
+    `
+      const custom: {
+        findLast(predicate: (value: unknown) => boolean): void;
+        [index: number]: unknown;
+      } = {} as never;
+      custom.findLast(value => typeof value === "string");
     `,
   ],
   invalid: [
@@ -240,13 +245,13 @@ ruleTester.run("prefer-type-guard", preferTypeGuard, {
     },
     {
       code: `
-        declare const values: Array<"a" | "b" | number>;
-        values.some(value => typeof value === "string");
+        declare const values: Array<string | number>;
+        values.findLast(value => typeof value === "string");
       `,
       errors: [
         {
           messageId: "preferTypeGuard",
-          data: { method: "some", predicate: "isString" },
+          data: { method: "findLast", predicate: "isString" },
         },
       ],
     },
@@ -279,7 +284,7 @@ ruleTester.run("prefer-type-guard", preferTypeGuard, {
         declare const values: unknown[];
         values.filter(value => Array.isArray(value));
         values.find(value => Array.isArray(value));
-        values.some(value => Array.isArray(value));
+        values.findLast(value => Array.isArray(value));
         values.every(value => Array.isArray(value));
       `,
       output: null,
@@ -294,23 +299,11 @@ ruleTester.run("prefer-type-guard", preferTypeGuard, {
         },
         {
           messageId: "preferTypeGuard",
-          data: { method: "some", predicate: "isArray" },
+          data: { method: "findLast", predicate: "isArray" },
         },
         {
           messageId: "preferTypeGuard",
           data: { method: "every", predicate: "isArray" },
-        },
-      ],
-    },
-    {
-      code: `
-        declare const values: Array<unknown[] | string>;
-        values.some(value => Array.isArray(value));
-      `,
-      errors: [
-        {
-          messageId: "preferTypeGuard",
-          data: { method: "some", predicate: "isArray" },
         },
       ],
     },

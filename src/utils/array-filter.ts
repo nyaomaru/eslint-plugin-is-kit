@@ -14,9 +14,14 @@ export interface ArrayPredicateCall {
   predicate: TSESTree.CallExpression["arguments"][number];
 }
 
-export type ArrayPredicateMethod = "filter" | "find" | "some" | "every";
+export type ArrayPredicateMethod = "filter" | "find" | "findLast" | "every";
 
-const arrayPredicateMethods = new Set<ArrayPredicateMethod>(["filter", "find", "some", "every"]);
+const arrayPredicateMethods = new Set<ArrayPredicateMethod>([
+  "filter",
+  "find",
+  "findLast",
+  "every",
+]);
 
 export function getArrayFilterCall(
   node: TSESTree.CallExpression,

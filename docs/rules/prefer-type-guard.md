@@ -1,7 +1,7 @@
 # `prefer-type-guard`
 
 Prefers reusable is-kit type guards over inline predicates passed directly to
-the built-in array methods `filter`, `find`, `some`, and `every` when the
+the built-in array methods `filter`, `find`, `findLast`, and `every` when the
 replacement preserves runtime behavior and useful narrowing.
 
 Examples of **incorrect** code:
@@ -10,7 +10,7 @@ Examples of **incorrect** code:
 values.filter((value) => typeof value === "string");
 values.filter((value) => typeof value === "number");
 values.find((value) => value === null);
-values.some((value) => value === undefined);
+values.findLast((value) => value === undefined);
 values.every((value) => Array.isArray(value));
 ```
 
@@ -22,7 +22,7 @@ import { isArray, isNull, isNumberPrimitive, isString, isUndefined } from "is-ki
 values.filter(isString);
 values.filter(isNumberPrimitive);
 values.find(isNull);
-values.some(isUndefined);
+values.findLast(isUndefined);
 values.every(isArray);
 
 if (typeof value === "string") {
@@ -48,17 +48,15 @@ Supported equivalent replacements:
 `isNumber` rejects `NaN` and positive or negative infinity, so that replacement
 would change runtime behavior.
 
-For `filter`, `find`, and `every`, the rule verifies that the is-kit guard's
-target type remains assignable to the array element type. This prevents a broad
-guard such as `isString` from weakening the inferred result of a literal union.
-`some` does not return or establish an element type, so it may also report safe
-literal-union replacements when the checked type can occur.
+For `filter`, `find`, `findLast`, and `every`, the rule verifies that the is-kit
+guard's target type remains assignable to the array element type. This prevents
+a broad guard such as `isString` from weakening the inferred result of a
+literal union.
 
 `isArray` narrows to `readonly unknown[]`, unlike the native `Array.isArray`
 declaration's `any[]`. For narrowing methods, this initial implementation only
 reports `isArray` replacements for `any` or `unknown` element types, where the
-safer narrowing is guaranteed to fit. `some` can additionally report unions
-with a concrete array member.
+safer narrowing is guaranteed to fit.
 
 The rule does not report control flow, custom methods, block-bodied predicates,
 already-narrow element types, loose null equality, shadowed globals, or a

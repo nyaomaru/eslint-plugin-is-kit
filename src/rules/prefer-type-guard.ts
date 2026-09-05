@@ -2,7 +2,6 @@ import { AST_NODE_TYPES, ESLintUtils, type TSESTree } from "@typescript-eslint/u
 import type ts from "typescript";
 
 import {
-  type ArrayPredicateMethod,
   getArrayPredicateCall,
   isDefaultLibrarySymbol,
   isGlobalIdentifier,
@@ -64,10 +63,7 @@ export const preferTypeGuard = createRule<[], MessageIds>({
         }
 
         const predicate = getGuardPredicate(predicateCall.predicate);
-        if (
-          predicate == null ||
-          !replacementImprovesType(predicateCall.elementType, predicate, predicateCall.method)
-        ) {
+        if (predicate == null || !replacementImprovesType(predicateCall.elementType, predicate)) {
           return;
         }
 
@@ -140,17 +136,13 @@ export const preferTypeGuard = createRule<[], MessageIds>({
       return "isArray";
     }
 
-    function replacementImprovesType(
-      elementType: ts.Type,
-      predicate: GuardPredicate,
-      method: ArrayPredicateMethod,
-    ): boolean {
+    function replacementImprovesType(elementType: ts.Type, predicate: GuardPredicate): boolean {
       if (isNeverType(elementType) || containsTypeParameter(elementType)) {
         return false;
       }
 
       if (predicate === "isArray") {
-        return arrayReplacementImprovesType(elementType, method);
+        return containsUncertainType(elementType);
       }
 
       const targetType = getPredicateTargetType(checker, predicate);
@@ -161,40 +153,7 @@ export const preferTypeGuard = createRule<[], MessageIds>({
         return false;
       }
 
-      if (method !== "some") {
-        return checker.isTypeAssignableTo(targetType, elementType);
-      }
-
-      return typeCouldContainTarget(elementType, targetType);
-    }
-
-    function arrayReplacementImprovesType(
-      elementType: ts.Type,
-      method: ArrayPredicateMethod,
-    ): boolean {
-      if (containsUncertainType(elementType)) {
-        return true;
-      }
-
-      const parts = elementType.isUnion() ? elementType.types : [elementType];
-      const arrayParts = parts.filter(
-        (part) => checker.isArrayType(part) || checker.isTupleType(part),
-      );
-
-      return method === "some" && arrayParts.length > 0 && arrayParts.length < parts.length;
-    }
-
-    function typeCouldContainTarget(elementType: ts.Type, targetType: ts.Type): boolean {
-      if (containsUncertainType(elementType)) {
-        return true;
-      }
-
-      const parts = elementType.isUnion() ? elementType.types : [elementType];
-      return parts.some(
-        (part) =>
-          checker.isTypeAssignableTo(part, targetType) ||
-          checker.isTypeAssignableTo(targetType, part),
-      );
+      return checker.isTypeAssignableTo(targetType, elementType);
     }
   },
 });
