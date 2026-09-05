@@ -45,12 +45,17 @@
       }
     }
   },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
   "scripts": {
     "build": "tsup src/index.ts --format esm,cjs --dts --clean",
     "format": "oxfmt .",
     "format:check": "oxfmt --check .",
     "lint": "oxlint .",
     "prepack": "pnpm build",
+    "release:check": "pnpm check && pnpm smoke",
     "smoke": "node scripts/smoke-test.mjs",
     "test": "vitest run",
     "typecheck": "tsc --noEmit",
