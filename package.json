@@ -63,6 +63,7 @@
     "@typescript-eslint/parser": "^8.69.0",
     "@typescript-eslint/rule-tester": "^8.69.0",
     "eslint": "^10.9.1",
+    "lefthook": "^2.1.12",
     "oxfmt": "^0.65.0",
     "oxlint": "^1.80.0",
     "publint": "^0.3.24",
