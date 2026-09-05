@@ -1,7 +1,7 @@
-import { preferTypeGuardFilter } from "../../src/rules/prefer-type-guard-filter.js";
+import { preferTypeGuard } from "../../src/rules/prefer-type-guard.js";
 import { ruleTester } from "../rule-tester.js";
 
-ruleTester.run("prefer-type-guard-filter", preferTypeGuardFilter, {
+ruleTester.run("prefer-type-guard", preferTypeGuard, {
   valid: [
     `
       declare const value: unknown;

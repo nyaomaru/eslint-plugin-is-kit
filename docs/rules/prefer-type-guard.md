@@ -1,4 +1,4 @@
-# `prefer-type-guard-filter`
+# `prefer-type-guard`
 
 Prefers reusable is-kit type guards over inline predicates passed directly to
 the built-in array methods `filter`, `find`, `some`, and `every` when the

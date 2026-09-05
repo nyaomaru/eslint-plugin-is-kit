@@ -35,8 +35,8 @@ const predicatesByTypeof: Readonly<Record<string, GuardPredicate>> = {
   undefined: "isUndefined",
 };
 
-export const preferTypeGuardFilter = createRule<[], MessageIds>({
-  name: "prefer-type-guard-filter",
+export const preferTypeGuard = createRule<[], MessageIds>({
+  name: "prefer-type-guard",
   meta: {
     type: "suggestion",
     docs: {

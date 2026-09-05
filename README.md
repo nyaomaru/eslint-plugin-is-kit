@@ -32,10 +32,10 @@ alone.
 
 ### Explicit predicate style
 
-| Rule                                                                 | Description                                                       | Recommended |
-| -------------------------------------------------------------------- | ----------------------------------------------------------------- | ----------- |
-| [`prefer-is-non-nullish`](docs/rules/prefer-is-non-nullish.md)       | Prefers `isNotNil` over inline nullish-removal filter predicates. | No          |
-| [`prefer-type-guard-filter`](docs/rules/prefer-type-guard-filter.md) | Prefers reusable is-kit guards in array predicate positions.      | No          |
+| Rule                                                           | Description                                                       | Recommended |
+| -------------------------------------------------------------- | ----------------------------------------------------------------- | ----------- |
+| [`prefer-is-non-nullish`](docs/rules/prefer-is-non-nullish.md) | Prefers `isNotNil` over inline nullish-removal filter predicates. | No          |
+| [`prefer-type-guard`](docs/rules/prefer-type-guard.md)         | Prefers reusable is-kit guards in array predicate positions.      | No          |
 
 All rules require TypeScript type information and intentionally provide no
 autofix or editor suggestion.

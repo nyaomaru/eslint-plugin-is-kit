@@ -8,7 +8,7 @@ describe("plugin", () => {
       "no-ambiguous-filter-boolean",
       "no-redundant-predicate",
       "prefer-is-non-nullish",
-      "prefer-type-guard-filter",
+      "prefer-type-guard",
     ]);
   });
 
