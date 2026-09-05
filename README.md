@@ -46,6 +46,8 @@ autofix or editor suggestion.
 pnpm add -D eslint-plugin-is-kit eslint typescript@^6.0.3 typescript-eslint@^8.69.0
 ```
 
+The plugin supports TypeScript 5.7 through 6.0.
+
 Install `is-kit` when adopting the predicates suggested by opt-in rules:
 
 ```sh
