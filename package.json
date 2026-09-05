@@ -1,0 +1,84 @@
+{
+  "name": "eslint-plugin-is-kit",
+  "version": "0.1.0",
+  "description": "Type-aware ESLint rules for precise TypeScript predicates.",
+  "keywords": [
+    "boolean",
+    "eslint",
+    "eslintplugin",
+    "filter",
+    "is-kit",
+    "type-aware",
+    "type-guard",
+    "typescript"
+  ],
+  "homepage": "https://github.com/nyaomaru/eslint-plugin-is-kit#readme",
+  "bugs": {
+    "url": "https://github.com/nyaomaru/eslint-plugin-is-kit/issues"
+  },
+  "license": "MIT",
+  "author": "nyaomaru",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nyaomaru/eslint-plugin-is-kit.git"
+  },
+  "files": [
+    "dist",
+    "docs",
+    "README.md",
+    "LICENSE"
+  ],
+  "type": "module",
+  "sideEffects": false,
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      }
+    }
+  },
+  "scripts": {
+    "build": "tsup src/index.ts --format esm,cjs --dts --clean",
+    "format": "oxfmt .",
+    "format:check": "oxfmt --check .",
+    "lint": "oxlint .",
+    "prepack": "pnpm build",
+    "smoke": "node scripts/smoke-test.mjs",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit",
+    "check": "pnpm format:check && pnpm lint && pnpm typecheck && pnpm test && pnpm build && publint"
+  },
+  "dependencies": {
+    "@typescript-eslint/utils": "^8.69.0"
+  },
+  "devDependencies": {
+    "@types/node": "^26.4.0",
+    "@typescript-eslint/parser": "^8.69.0",
+    "@typescript-eslint/rule-tester": "^8.69.0",
+    "eslint": "^10.9.1",
+    "lefthook": "^2.1.12",
+    "oxfmt": "^0.65.0",
+    "oxlint": "^1.80.0",
+    "publint": "^0.3.24",
+    "tsup": "^8.5.1",
+    "typescript": "^6.0.3",
+    "vitest": "^4.1.11"
+  },
+  "peerDependencies": {
+    "@typescript-eslint/parser": "^8.69.0",
+    "eslint": "^8.57.0 || ^9.0.0 || ^10.0.0",
+    "typescript": ">=5.7.0 <6.1.0"
+  },
+  "engines": {
+    "node": "^18.18.0 || ^20.9.0 || >=21.1.0"
+  },
+  "packageManager": "pnpm@11.22.0"
+}
