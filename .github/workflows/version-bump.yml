@@ -1,0 +1,71 @@
+name: Version Bump
+
+on:
+  workflow_dispatch:
+    inputs:
+      release_type:
+        description: Select version bump type
+        required: true
+        default: patch
+        type: choice
+        options: [patch, minor, major]
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  bump-version:
+    name: Bump version
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Setup pnpm and Node.js
+        uses: pnpm/setup@v1
+        with:
+          runtime: node@22.22.0
+          cache: true
+          install: false
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Generate new version
+        shell: bash
+        run: |
+          pnpm version "${{ inputs.release_type }}" --no-git-tag-version
+          pnpm version:sync
+          new_version="$(node -p "require('./package.json').version")"
+          printf 'new_version=%s\n' "$new_version" >> "$GITHUB_ENV"
+
+      - name: Validate version bump
+        run: pnpm check
+
+      - name: Create release branch
+        run: git switch -c "release/${{ env.new_version }}"
+
+      - name: Configure git identity
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      - name: Commit and push changes
+        run: |
+          git add package.json pnpm-lock.yaml src/index.ts
+          git commit -m "chore(release): bump version to ${{ env.new_version }}"
+          git push --set-upstream origin "release/${{ env.new_version }}"
+
+      - name: Create pull request
+        shell: bash
+        run: |
+          gh pr create \
+            --base main \
+            --head "release/${{ env.new_version }}" \
+            --title "chore(release): bump version to ${{ env.new_version }}" \
+            --body "Automated version bump for release ${{ env.new_version }}."

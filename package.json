@@ -59,7 +59,9 @@
     "smoke": "node scripts/smoke-test.mjs",
     "test": "vitest run",
     "typecheck": "tsc --noEmit",
-    "check": "pnpm format:check && pnpm lint && pnpm typecheck && pnpm test && pnpm build && publint"
+    "version:check": "node scripts/sync-version.mjs --check",
+    "version:sync": "node scripts/sync-version.mjs",
+    "check": "pnpm version:check && pnpm format:check && pnpm lint && pnpm typecheck && pnpm test && pnpm build && publint"
   },
   "dependencies": {
     "@typescript-eslint/utils": "^8.69.0"

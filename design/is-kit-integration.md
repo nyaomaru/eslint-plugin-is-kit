@@ -106,6 +106,13 @@ Once the package exists, configure npm Trusted Publishing for:
 
 After one successful OIDC publish, remove the long-lived `NPM_TOKEN` secret.
 
+For later releases, run the `Version Bump` workflow from the Actions page. It
+updates `package.json` and the plugin metadata version together, validates the
+result, and opens a `release/<version>` pull request. Merge that pull request
+before creating the matching GitHub Release. The repository setting **Allow
+GitHub Actions to create and approve pull requests** must be enabled for the
+workflow to open that pull request.
+
 ### 4. Create the is-kit integration PR
 
 Create a new branch from the latest `nyaomaru/is-kit` main branch. Suggested
