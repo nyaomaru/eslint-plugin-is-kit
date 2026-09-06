@@ -45,16 +45,23 @@
       }
     }
   },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
   "scripts": {
     "build": "tsup src/index.ts --format esm,cjs --dts --clean",
     "format": "oxfmt .",
     "format:check": "oxfmt --check .",
     "lint": "oxlint .",
     "prepack": "pnpm build",
+    "release:check": "pnpm check && pnpm smoke",
     "smoke": "node scripts/smoke-test.mjs",
     "test": "vitest run",
     "typecheck": "tsc --noEmit",
-    "check": "pnpm format:check && pnpm lint && pnpm typecheck && pnpm test && pnpm build && publint"
+    "version:check": "node scripts/sync-version.mjs --check",
+    "version:sync": "node scripts/sync-version.mjs",
+    "check": "pnpm version:check && pnpm format:check && pnpm lint && pnpm typecheck && pnpm test && pnpm build && publint"
   },
   "dependencies": {
     "@typescript-eslint/utils": "^8.69.0"
@@ -78,7 +85,7 @@
     "typescript": ">=5.7.0 <6.1.0"
   },
   "engines": {
-    "node": "^18.18.0 || ^20.9.0 || >=21.1.0"
+    "node": "^22.13.0 || >=24.0.0"
   },
   "packageManager": "pnpm@11.22.0"
 }
