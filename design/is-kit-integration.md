@@ -56,8 +56,8 @@ use cases or needs a longer migration guide.
 
 ### 1. Complete release preparation
 
-Merge `eslint-plugin-is-kit#2` after its Build, Lint, Test, and Smoke Test jobs
-pass.
+Merge `eslint-plugin-is-kit#2` after its Build, Lint, Test, and compatibility
+smoke-test jobs pass.
 
 The merged changes must include:
 

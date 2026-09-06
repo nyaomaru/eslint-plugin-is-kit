@@ -128,12 +128,12 @@ truthy values.”
 
 ## Compatibility
 
-| Dependency                  | Supported versions                   |
-| --------------------------- | ------------------------------------ |
-| Node.js                     | `^18.18.0`, `^20.9.0`, or `>=21.1.0` |
-| ESLint                      | `^8.57.0`, `^9.0.0`, or `^10.0.0`    |
-| TypeScript                  | `>=5.7.0 <6.1.0`                     |
-| `@typescript-eslint/parser` | `^8.69.0`                            |
+| Dependency                  | Supported versions                |
+| --------------------------- | --------------------------------- |
+| Node.js                     | `^22.13.0` or `>=24.0.0`          |
+| ESLint                      | `^8.57.0`, `^9.0.0`, or `^10.0.0` |
+| TypeScript                  | `>=5.7.0 <6.1.0`                  |
+| `@typescript-eslint/parser` | `^8.69.0`                         |
 
 The package ships ESM and CommonJS builds with declarations for both entry
 points.

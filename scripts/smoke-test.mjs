@@ -30,10 +30,10 @@ try {
   const tarballPath = join(packageDirectory, tarballs[0]);
   const dependencies = {
     "@typescript-eslint/parser": packageJson.devDependencies["@typescript-eslint/parser"],
-    eslint: packageJson.devDependencies.eslint,
+    eslint: process.env.SMOKE_ESLINT_VERSION ?? packageJson.devDependencies.eslint,
     "eslint-plugin-is-kit": `file:${tarballPath}`,
     "is-kit": "1.14.0",
-    typescript: packageJson.devDependencies.typescript,
+    typescript: process.env.SMOKE_TYPESCRIPT_VERSION ?? packageJson.devDependencies.typescript,
   };
 
   writeFileSync(
