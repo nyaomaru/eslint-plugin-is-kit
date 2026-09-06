@@ -1,0 +1,36 @@
+name: Update Changelog
+
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  changelog:
+    name: Create changelog pull request
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      # v0.6.13. Pinning the commit and CLI package keeps changelog output
+      # reproducible while changelog-bot is pre-1.0.
+      - name: Generate changelog
+        uses: nyaomaru/changelog-bot@1312c1cebb3ea9e7336f851dcd40a08b09950db4
+        with:
+          changelog-path: CHANGELOG.md
+          base-branch: main
+          provider: openai
+          language: en
+          release-tag: ${{ github.event.release.tag_name }}
+          release-name: ${{ github.event.release.tag_name }}
+          release-body: ${{ github.event.release.body }}
+          npm-version: 0.6.13
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
