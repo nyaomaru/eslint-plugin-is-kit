@@ -1,0 +1,46 @@
+name: Feature request
+description: Suggest a new rule or an improvement to existing behavior.
+title: "[Feature]: "
+labels:
+  - enhancement
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for suggesting an improvement. A rough idea is enough to start the discussion.
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: Idea or use case
+      description: Describe your idea, the problem you want to solve, or the use case you have in mind.
+      placeholder: What would you like eslint-plugin-is-kit to support or improve?
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed rule or behavior
+      description: If you have a concrete rule or configuration in mind, show how you would like it to work.
+      placeholder: |
+        ```js
+        export default [
+          {
+            rules: {
+              'is-kit/example-rule': 'warn',
+            },
+          },
+        ];
+        ```
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: Describe any workarounds or alternative designs you considered.
+
+  - type: textarea
+    id: additional-context
+    attributes:
+      label: Additional context
+      description: Add any other information that may help evaluate the proposal.
